@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Encurtador de URL</title>
+<style>
+    /* Estilos CSS opcionais */
+    /* Adicione estilos aqui conforme necessário */
+</style>
+</head>
+<body>
+<h1>Encurtador de URL</h1>
+<form id="urlForm">
+    <label for="customPath">Personalize a parte do URL (opcional):</label><br>
+    <input type="text" id="customPath" name="customPath"><br><br>
+    <label for="originalURL">Insira o URL para encurtar:</label><br>
+    <input type="text" id="originalURL" name="originalURL" required><br><br>
+    <button type="submit">Encurtar</button>
+</form>
+<div id="shortenedURL"></div>
+
+<script>
+document.getElementById('urlForm').addEventListener('submit', function(event) {
+    event.preventDefault();
+    var customPath = document.getElementById('customPath').value;
+    var originalURL = document.getElementById('originalURL').value;
+    var shortenedURL = generateShortenedURL(customPath, originalURL);
+    document.getElementById('shortenedURL').innerHTML = '<a href="' + shortenedURL + '" target="_blank">' + shortenedURL + '</a>';
+});
+
+function generateShortenedURL(customPath, originalURL) {
+    var storageKey = 'urls';
+    var urls = JSON.parse(localStorage.getItem(storageKey)) || {};
+    var shortenedURL = customPath || generateRandomString(6); // Use o caminho personalizado ou um código curto aleatório
+    urls[shortenedURL] = originalURL;
+    localStorage.setItem(storageKey, JSON.stringify(urls));
+    return 'https://takasoftware.com.br/' + shortenedURL;
+}
+
+function generateRandomString(length) {
+    var chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    var randomString = '';
+    for (var i = 0; i < length; i++) {
+        randomString += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return randomString;
+}
+
+// Verificar se há um URL encurtado na URL atual e redirecionar, se houver
+window.addEventListener('DOMContentLoaded', function() {
+    var shortenedURL = window.location.pathname.substring(1);
+    if (shortenedURL) {
+        var urls = JSON.parse(localStorage.getItem('urls'));
+        var originalURL = urls[shortenedURL];
+        if (originalURL) {
+            window.location.href = originalURL;
+        } else {
+            setTimeout(function() {
+                alert('URL encurtado não encontrado.');
+            }, 0);
+        }
+    }
+});
+</script>
+</body>
+</html>
